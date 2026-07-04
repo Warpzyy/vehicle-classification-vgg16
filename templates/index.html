@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Classifier · VGG16</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f5f6f8;
+            --surface: #ffffff;
+            --border: #e3e6eb;
+            --text: #14171f;
+            --text-muted: #6b7280;
+            --accent: #3454d1;
+            --accent-dark: #263f9e;
+            --accent-soft: #eef1fc;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+        .topbar {
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+            padding: 18px 32px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .topbar .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+        .topbar .wordmark {
+            font-family: 'Sora', sans-serif;
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: 0.01em;
+        }
+        .topbar .tag {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: 2px 10px;
+            margin-left: 4px;
+        }
+        .page {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 56px 20px 40px;
+        }
+        .eyebrow {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin: 0 0 8px;
+        }
+        h1 {
+            font-family: 'Sora', sans-serif;
+            font-size: 26px;
+            font-weight: 700;
+            margin: 0 0 6px;
+            letter-spacing: -0.01em;
+        }
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 14.5px;
+            margin: 0 0 28px;
+            line-height: 1.5;
+        }
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 28px;
+            box-shadow: 0 1px 2px rgba(20,23,31,0.03), 0 10px 30px rgba(20,23,31,0.04);
+        }
+        .upload-zone {
+            border: 1.5px dashed #c7ccd6;
+            border-radius: 10px;
+            padding: 36px 20px;
+            text-align: center;
+            cursor: pointer;
+            display: block;
+            transition: border-color 0.15s, background 0.15s;
+        }
+        .upload-zone:hover {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+        }
+        .upload-zone svg {
+            width: 30px;
+            height: 30px;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+        .upload-zone .primary-text {
+            font-weight: 600;
+            font-size: 14.5px;
+            margin: 0 0 3px;
+        }
+        .upload-zone .secondary-text {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11.5px;
+            color: var(--text-muted);
+            margin: 0;
+        }
+        #preview {
+            max-height: 200px;
+            display: none;
+            margin-top: 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        .btn-predict {
+            width: 100%;
+            margin-top: 20px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 13px;
+            border-radius: 9px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 14.5px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .btn-predict:hover { background: var(--accent-dark); }
+        .classes {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .class-pill {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.03em;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: 4px 12px;
+        }
+        .footer-note {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 12px;
+            margin-top: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <span class="dot"></span>
+        <span class="wordmark">Vehicle Classifier</span>
+        <span class="tag">VGG16</span>
+    </div>
+
+    <div class="page">
+        <p class="eyebrow">Image classification</p>
+        <h1>Klasifikasi Jenis Kendaraan</h1>
+        <p class="subtitle">Unggah satu gambar kendaraan, model akan memprediksi apakah itu mobil, motor, bus, atau truk menggunakan transfer learning VGG16.</p>
+
+        <div class="card">
+            <form action="/predict" method="post" enctype="multipart/form-data" id="uploadForm">
+                <label for="fileInput" class="upload-zone">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 16V4M12 4l-4 4M12 4l4 4"/>
+                        <path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>
+                    </svg>
+                    <p class="primary-text">Klik untuk unggah gambar</p>
+                    <p class="secondary-text">JPG · JPEG · PNG</p>
+                    <img id="preview" alt="Preview">
+                </label>
+                <input type="file" name="file" id="fileInput" accept=".png,.jpg,.jpeg" hidden required>
+
+                <button type="submit" class="btn-predict">Prediksi Sekarang</button>
+            </form>
+
+            <div class="classes">
+                <span class="class-pill">MOBIL</span>
+                <span class="class-pill">MOTOR</span>
+                <span class="class-pill">BUS</span>
+                <span class="class-pill">TRUK</span>
+            </div>
+        </div>
+
+        <p class="footer-note">Tugas Kecerdasan Buatan · Transfer Learning VGG16 · Flask</p>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const preview = document.getElementById('preview');
+        fileInput.addEventListener('change', function () {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+# Virtual environment
+venv/
+env/
+
+# Dataset (terlalu besar, jelaskan sumbernya di README saja)
+dataset/
+dataset_raw/
+
+# Uploaded images saat runtime
+static/uploads/*
+!static/uploads/.gitkeep
+
+# Python cache
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+
+model/*.h5

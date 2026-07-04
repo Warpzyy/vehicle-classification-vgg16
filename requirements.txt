@@ -1,0 +1,9 @@
+Flask
+tensorflow
+numpy
+Pillow
+Werkzeug
+gunicorn
+matplotlib
+scipy
+gdown
