@@ -1,3 +1,8 @@
+"""
+APLIKASI WEB FLASK - KLASIFIKASI JENIS KENDARAAN
+Menggunakan Model Transfer Learning VGG16
+"""
+
 import os
 import json
 import uuid
@@ -7,6 +12,7 @@ import gdown
 from flask import Flask, render_template, request, redirect, url_for
 from werkzeug.utils import secure_filename
 from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing import image as keras_image
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, "model", "vgg16_vehicle_model.h5")
@@ -32,8 +38,7 @@ if not os.path.exists(MODEL_PATH):
     print("Download model selesai.")
 
 # =========================================================================
-# BANGUN ULANG ARSITEKTUR MODEL, LALU LOAD BOBOTNYA SAJA
-# (lebih tahan terhadap perbedaan versi Keras/TensorFlow antar environment)
+# MEMUAT MODEL
 # =========================================================================
 print("Memuat model...")
 model = load_model(MODEL_PATH)
