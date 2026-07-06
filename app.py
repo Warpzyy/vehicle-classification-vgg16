@@ -26,6 +26,18 @@ app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+import gdown
+
+GDRIVE_FILE_ID = "1k0z_7Wrn6Q30agHYWITFeAR9L9tU6vEz"
+
+if not os.path.exists(MODEL_PATH):
+    print("Model belum ada, mengunduh dari Google Drive...")
+    os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
+    gdown.download(f"https://drive.google.com/uc?id={GDRIVE_FILE_ID}", MODEL_PATH, quiet=False)
+    print("Download model selesai.")
+
+print("Memuat model...")
+model = load_model(MODEL_PATH)
 print("Memuat model...")
 model = load_model(MODEL_PATH)
 
