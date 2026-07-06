@@ -15,12 +15,12 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image as keras_image
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_PATH = os.path.join(BASE_DIR, "model", "vgg16_vehicle_model.h5")
+MODEL_PATH = os.path.join(BASE_DIR, "model", "vgg16_vehicle_model.keras")
 CLASS_INDEX_PATH = os.path.join(BASE_DIR, "model", "class_indices.json")
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "static", "uploads")
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg"}
 IMG_SIZE = (224, 224)
-GDRIVE_FILE_ID = "1k0z_7Wrn6Q30agHYWITFeAR9L9tU6vEz"
+GDRIVE_FILE_ID = "1bDJuShA9CbHziQjZqIo7e-7mEF2n9DsP"
 
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
