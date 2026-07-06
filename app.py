@@ -1,17 +1,12 @@
-"""
-APLIKASI WEB FLASK - KLASIFIKASI JENIS KENDARAAN
-Menggunakan Model Transfer Learning VGG16
-"""
-
 import os
 import json
 import uuid
 
 import numpy as np
+import gdown
 from flask import Flask, render_template, request, redirect, url_for
 from werkzeug.utils import secure_filename
 from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing import image as keras_image
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, "model", "vgg16_vehicle_model.h5")
@@ -19,6 +14,7 @@ CLASS_INDEX_PATH = os.path.join(BASE_DIR, "model", "class_indices.json")
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "static", "uploads")
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg"}
 IMG_SIZE = (224, 224)
+GDRIVE_FILE_ID = "1k0z_7Wrn6Q30agHYWITFeAR9L9tU6vEz"
 
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
@@ -26,26 +22,28 @@ app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-import gdown
-
-GDRIVE_FILE_ID = "1k0z_7Wrn6Q30agHYWITFeAR9L9tU6vEz"
-
+# =========================================================================
+# DOWNLOAD MODEL DARI GOOGLE DRIVE (KALAU BELUM ADA)
+# =========================================================================
 if not os.path.exists(MODEL_PATH):
     print("Model belum ada, mengunduh dari Google Drive...")
     os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
     gdown.download(f"https://drive.google.com/uc?id={GDRIVE_FILE_ID}", MODEL_PATH, quiet=False)
     print("Download model selesai.")
 
+# =========================================================================
+# BANGUN ULANG ARSITEKTUR MODEL, LALU LOAD BOBOTNYA SAJA
+# (lebih tahan terhadap perbedaan versi Keras/TensorFlow antar environment)
+# =========================================================================
 print("Memuat model...")
 model = load_model(MODEL_PATH)
-print("Memuat model...")
-model = load_model(MODEL_PATH)
+print("Model siap digunakan.")
 
 with open(CLASS_INDEX_PATH, "r") as f:
     class_indices = json.load(f)
 
 idx_to_class = {v: k for k, v in class_indices.items()}
-print("Model siap. Kelas:", idx_to_class)
+print("Kelas:", idx_to_class)
 
 
 def allowed_file(filename):
