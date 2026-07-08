@@ -1,10 +1,9 @@
-Flask
+Flask==3.0.3
 tensorflow
-keras
 numpy
-Pillow
-Werkzeug
-gunicorn
-matplotlib
+Pillow==10.3.0
+Werkzeug==3.0.3
+gunicorn==22.0.0
+matplotlib==3.8.4
 scipy
-gdown
+gdown==5.2.0
