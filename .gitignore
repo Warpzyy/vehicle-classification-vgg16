@@ -19,3 +19,4 @@ __pycache__/
 
 model/*.h5
 model/*.keras
+model/*.npz

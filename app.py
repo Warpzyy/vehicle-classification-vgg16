@@ -11,16 +11,18 @@ import numpy as np
 import gdown
 from flask import Flask, render_template, request, redirect, url_for
 from werkzeug.utils import secure_filename
-from tensorflow.keras.models import load_model
+from tensorflow.keras.applications import VGG16
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Flatten, Dropout
 from tensorflow.keras.preprocessing import image as keras_image
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_PATH = os.path.join(BASE_DIR, "model", "vgg16_vehicle_model.keras")
+WEIGHTS_PATH = os.path.join(BASE_DIR, "model", "vgg16_weights.npz")
 CLASS_INDEX_PATH = os.path.join(BASE_DIR, "model", "class_indices.json")
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "static", "uploads")
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg"}
 IMG_SIZE = (224, 224)
-GDRIVE_FILE_ID = "1bDJuShA9CbHziQjZqIo7e-7mEF2n9DsP"
+GDRIVE_FILE_ID = "1tdVCl5-rr-HdFZ6px_oqFfM0jm033Xd5"
 
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
@@ -29,19 +31,33 @@ app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # =========================================================================
-# DOWNLOAD MODEL DARI GOOGLE DRIVE (KALAU BELUM ADA)
+# DOWNLOAD BOBOT MODEL DARI GOOGLE DRIVE (KALAU BELUM ADA)
 # =========================================================================
-if not os.path.exists(MODEL_PATH):
-    print("Model belum ada, mengunduh dari Google Drive...")
-    os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
-    gdown.download(f"https://drive.google.com/uc?id={GDRIVE_FILE_ID}", MODEL_PATH, quiet=False)
-    print("Download model selesai.")
+if not os.path.exists(WEIGHTS_PATH):
+    print("Bobot model belum ada, mengunduh dari Google Drive...")
+    os.makedirs(os.path.dirname(WEIGHTS_PATH), exist_ok=True)
+    gdown.download(f"https://drive.google.com/uc?id={GDRIVE_FILE_ID}", WEIGHTS_PATH, quiet=False)
+    print("Download bobot model selesai.")
 
 # =========================================================================
-# MEMUAT MODEL
+# BANGUN ULANG ARSITEKTUR MODEL DARI KODE (SAMA PERSIS SEPERTI train_model.py)
+# LALU TEMPELKAN BOBOTNYA - CARA INI KEBAL TERHADAP PERBEDAAN VERSI KERAS
 # =========================================================================
-print("Memuat model...")
-model = load_model(MODEL_PATH)
+print("Membangun arsitektur model...")
+base_model = VGG16(weights=None, include_top=False, input_shape=(224, 224, 3))
+
+model = Sequential([
+    base_model,
+    Flatten(),
+    Dense(256, activation="relu"),
+    Dropout(0.5),
+    Dense(4, activation="softmax"),
+])
+
+print("Memuat bobot model dari file .npz...")
+with np.load(WEIGHTS_PATH) as data:
+    weights = [data[key] for key in sorted(data.files, key=lambda x: int(x.replace("arr_", "")))]
+model.set_weights(weights)
 print("Model siap digunakan.")
 
 with open(CLASS_INDEX_PATH, "r") as f:
