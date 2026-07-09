@@ -1,9 +1,9 @@
-Flask==3.0.3
+Flask
 tensorflow
 numpy
-Pillow==10.3.0
-Werkzeug==3.0.3
-gunicorn==22.0.0
-matplotlib==3.8.4
+Pillow
+Werkzeug
+gunicorn
+matplotlib
 scipy
-gdown==5.2.0
+gdown
